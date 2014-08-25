@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+ 
+<configuration>
+  <system.web>
+    <compilation debug="true" targetFramework="4.0" />
+  </system.web>
+ 
+  <connectionStrings>
+    <add name="conexao" connectionString="data source=CORE2DUO-PC\SQLEXPRESS; Initial Catalog = dbcadprod; Integrated Security=true;" providerName="System.Data.SqlClient"/>
+  </connectionStrings>
+</configuration>
