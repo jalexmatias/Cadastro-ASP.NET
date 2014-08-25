@@ -1,0 +1,128 @@
+@{
+    Layout = "~/_SiteLayout.cshtml";
+    Page.Title = "Asian Fashion";
+}
+<div class="container">
+    <div class="col-xs-12">
+        <div class="col-sm-12 text-center fd2">
+            <p><h2 style="color:#0026ff">Cadastro de Produtos</h2></p>
+        </div>
+ 
+            
+            @{
+                // Conectando o banco
+ 
+                var banco = Database.Open("conexao");
+ 
+                // Recuperando a categoria
+ 
+                var busca_marcas = "SELECT * FROM marcas";
+ 
+                var tbmarcas = banco.Query(busca_marcas);
+ 
+                // Criando a validacao                              
+                
+                if (IsPost)
+                {
+ 
+                    var codcategoriafk = Request["txtcodcategoriafk"]; // @0
+                    var titulo = Request["txttitulo"]; // @1
+                    var preco = Request["txtpreco"]; // @2
+                    var foto = Request.Files["txtfoto"]; // @3
+                    var fileName = "";
+ 
+                    /* Validacao */
+ 
+                    if (codcategoriafk.IsEmpty())
+                    {
+                        ModelState.AddError("txtcodcategoriafk", "Digite a marca");
+ 
+                    }
+                    else if (titulo.IsEmpty())
+                    {
+                        ModelState.AddError("txttitulo", "Digite o nome");
+ 
+                    }
+                    else if (preco.IsEmpty())
+                    {
+                        ModelState.AddError("txtpreco", "Digite o preco");
+ 
+                    }
+                    else if (foto.FileName.IsEmpty())
+                    {
+                        ModelState.AddError("txtfoto", "Selecione uma foto");
+ 
+                    }
+                    else
+                    {
+                     
+                        var fileSavePath = "";
+                        var uploadedFile = Request.Files["txtfoto"];
+                        fileName = Path.GetFileName(uploadedFile.FileName);
+                        fileSavePath = Server.MapPath("~/images/" + fileName);
+                        uploadedFile.SaveAs(fileSavePath);
+ 
+                        var insere_produtos = "INSERT INTO produto (marcas_id, nome, preco, fotos) VALUES (@0, @1, @2, @3)";
+ 
+                        banco.Execute(insere_produtos, codcategoriafk, titulo, preco, fileName);
+ 
+                        Response.Redirect(@Href("~/cadpro"));
+                         
+                    }
+ 
+                }
+            }   
+            
+ 
+             <!-- Formulario -->
+            <div class="col-xs-12 text-center "><br />               
+                <form method="post" enctype="multipart/form-data">
+ 
+                    <!-- Recebendo a categoria -->
+                    <div class="col-xs-4 text-left fd1">
+                        <label>Escolha a marca:</label> &nbsp;              
+                        <select name="txtcodcategoriafk">
+                            @foreach (var marcas in tbmarcas)
+                            {
+ 
+                                <option value="@marcas.id">@marcas.descricao</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="clear"></div>  
+                      
+                        <!-- Recebendo a titulo -->
+                    <div class="col-xs-4 text-left fd1">
+                        <label>Digite o None :</label>
+                        <input type="text" name="txttitulo">
+                    </div>
+                    <div class="clear"></div>   
+                     
+                        <!-- Recebendo o preco -->
+                    <div class="col-xs-4 text-left fd1">
+                        <label>Digite o Preço:</label>
+                        <input type="text" name="txtpreco"> 
+                    </div><br /><br />
+                    <div class="clear"></div>   
+                                        
+                            <!-- Recebendo a foto -->
+                    <div class="col-xs-4 text-left fd1">
+                         <label>Faça o upload da foto</label> <br />
+                    </div>
+                    <div class="clear"></div>   
+                    <div class="col-xs-4 fd1">   
+                        <input type="file" name="txtfoto"><br />
+                    </div>
+                    <div class="clear"></div> 
+ 
+                            <!-- botao -->
+                    <div class="col-xs-12 "><br />
+                            <button type="submit" class="button1">Cadastrar</button>
+                            <button type="button" class="button1 a" onclick="history.back()">Retornar</button>
+                    </div>
+                            <div class="controls">@Html.ValidationSummary()</div>
+               </form>
+            </div>
+ 
+        </div>
+</div>
